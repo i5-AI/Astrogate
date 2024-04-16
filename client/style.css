@@ -13,9 +13,8 @@ html, body {
   color: #3B3B3B;
   font-size: 25px;
   margin-left: 12%;
-  margin-right: 15%;
   margin-top: 8%;
-  min-width: 300px;
+  min-width: 250px;
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
 }
@@ -135,6 +134,7 @@ input[type="text"]:focus {
 }
 
 .container {
+  margin-top: 40px;
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -149,7 +149,6 @@ input[type="text"]:focus {
 }
 
 .chat-history {
-  min-width: 200px;
   flex-basis: 20%;
   margin-right: 2%;
   margin-left: 1.5%;
@@ -160,4 +159,22 @@ input[type="text"]:focus {
   margin-right: 2%;
   padding-right: 100px;
   padding-left: 100px;
+}
+
+.footer-div {
+  display: flex;
+  justify-content: center;
+}
+
+.footer {
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #3B3B3B;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.previous-chats {
+  padding-right: 10px;
 }

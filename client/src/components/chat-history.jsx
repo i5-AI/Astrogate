@@ -4,7 +4,7 @@ function ChatHistory() {
     return (
       <div className="chat-history">
         <div className="title">
-            <p>Previous Chats:</p>
+            <p className="previous-chats">Previous Chats:</p>
         </div>
         <div className="content">
             <div className="chats"></div>
