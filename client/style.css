@@ -31,27 +31,56 @@ html, body {
   padding-right: 20px;
 }
 
+.chat-bubble {
+  word-wrap: break-word;
+  box-sizing: border-box; /* This makes sure padding doesn't add to the width */
+  font-size: 17px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  background-color: #e0e0e0; /* Light grey background */
+  border-radius: 15px; /* Rounded corners for bubble look */
+  padding: 10px 15px; /* Some padding inside the bubble */
+  margin: 5px 0; /* Add space between messages */
+  max-width: 80%; /* Maximum width of a chat bubble */
+  word-wrap: break-word; /* Ensures the text wraps inside the bubble */
+  color: #232323;
+}
+
+.user-chats {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto; 
+  margin-bottom: 120px; /* Adjust this value to match the height of your message bar so there's no overlap */
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 10px 0;
+}
+
 .chat {
   height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
 }
 
 .messages {
+  position: absolute;
+  bottom: 1%;
+  left: 45%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   padding-bottom: 5%;
-  padding-right: 50px;
 }
 
 .message-bar {
   background-color: #D9D9D9;
   border-radius: 30px;
-  width: 50%;
-  height: 60px;
+  height: 50px;
+  width: 400px;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -83,7 +112,6 @@ html, body {
   border-radius: 50%;
   top: 10px;
   left: 10px;
-  margin-right: 100px;
 }
 
 .arrow {
@@ -146,6 +174,14 @@ input[type="text"]:focus {
 .box {
   border-radius: 20px;
   background-color: #838383;
+}
+
+.chats-container {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  height: 80vh; /* Full viewport height */
+  padding-bottom: 60px; 
 }
 
 .chat-history {
