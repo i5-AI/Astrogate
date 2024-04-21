@@ -1,5 +1,5 @@
 import requests
-from config import OPENAI_API_KEY
+from server.python.config import OPENAI_API_KEY
 
 def create_embeddings(text):
     url = "https://api.openai.com/v1/embeddings"
