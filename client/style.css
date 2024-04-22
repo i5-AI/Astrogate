@@ -41,7 +41,7 @@ html, body {
   border-radius: 15px; /* Rounded corners for bubble look */
   padding: 10px 15px; /* Some padding inside the bubble */
   margin: 5px 0; /* Add space between messages */
-  max-width: 80%; /* Maximum width of a chat bubble */
+  max-width: 100%; /* Maximum width of a chat bubble */
   word-wrap: break-word; /* Ensures the text wraps inside the bubble */
   color: #232323;
 }
@@ -49,12 +49,25 @@ html, body {
 .user-chats {
   max-height: calc(100vh - 120px);
   overflow-y: auto; 
-  margin-bottom: 120px; /* Adjust this value to match the height of your message bar so there's no overlap */
+  width: 100%; 
+  margin-bottom: 200px; /* Adjust this value to match the height of your message bar so there's no overlap */
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
-  align-items: flex-end;
   padding: 10px 0;
+  text-align: left; /* Default text alignment for the container */
+}
+
+.ai-message {
+  background-color: #a0a0a0; /* Darker gray background for AI messages */
+  align-self: flex-start; /* Align to the left */
+  width: 70%;
+}
+
+.user-message {
+  background-color: #e0e0e0; /* Lighter gray background for user messages */
+  align-self: flex-end; /* Align to the right */
+  /* width: 70%; */
+  text-align: right; /* Align text to the right within the bubble */
 }
 
 .chat {
@@ -68,7 +81,7 @@ html, body {
 .messages {
   position: absolute;
   bottom: 1%;
-  left: 45%;
+  left: 46%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -177,7 +190,7 @@ input[type="text"]:focus {
 }
 
 .chats-container {
-  width: 70%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   height: 80vh; /* Full viewport height */

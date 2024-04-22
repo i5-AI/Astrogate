@@ -1,50 +1,46 @@
 from flask import Flask, request, jsonify, render_template, make_response
-from flask_cors import CORS
 import requests
 import json
 import sys
 import os
-from python import config
+from flask_cors import CORS
+
+sys.path.append("..")
+from server.config import OPENAI_API_KEY, ZILLIZ_API_KEY, PUBLIC_ENDPOINT
 
 # flask_app = Flask(__name__)
-app = Flask(__name__, template_folder='client')
-CORS(app)
+# app = Flask(__name__, template_folder='client')
 
-@app.route("/api/orders", methods=["POST", "OPTIONS"])
-def api_create_order():
-    if request.method == "OPTIONS": # CORS preflight
-        return _build_cors_preflight_response()
-    elif request.method == "POST": # The actual request following the preflight
+app = Flask(__name__)
+
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allows all domains
+
+# app = Flask(__name__)
+# CORS(app, support_credentials=True)
+
+@app.route("/login")
+def login():
+  return jsonify({'success': 'ok'})
+
+@app.route("/")
+def helloWorld():
+  return "Hello, cross-origin-world!"
+
+@app.route("/api/data", methods=["GET", "POST"])
+def get_data():
+    if request.method == 'POST':
         data = request.get_json()
-        return _corsify_actual_response({"message": "Data received", "received_data": data}), 200
+        return jsonify({"message": "Data received", "received_data": data}), 200
+    elif request.method == 'GET':
+        sample_data = {"key6": "value1", "key3": "value5"}
+        return jsonify(sample_data), 200
     else:
-        raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
+        sample_data = {"key1": "value1", "key2": "value2"}
+        return jsonify(sample_data), 200
 
-def _build_cors_preflight_response():
-    response = make_response()
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add('Access-Control-Allow-Headers', "*")
-    response.headers.add('Access-Control-Allow-Methods', "*")
-    return response
-
-def _corsify_actual_response(response):
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# @app.route('/api/data', methods=['GET', 'POST', 'OPTIONS'])
-# def get_data():
-#     if request.method == "OPTIONS": # CORS preflight
-#         return _build_cors_preflight_response()
-#     elif request.method == 'POST':
-#         data = request.get_json()
-#         return jsonify({"message": "Data received", "received_data": data}), 200
-#     else:
-#         sample_data = {"key1": "value1", "key2": "value2"}
-#         return jsonify(sample_data), 200
+# @app.route('/')
+# def home():
+#     return render_template('index.html')
 
 @app.route('/create-embedding', methods=['POST'])
 def create_embedding():
@@ -232,5 +228,4 @@ def ask_gpt(question, document_text):
         raise Exception(error_message)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(debug=True, host='0.0.0.0', port=3000)
