@@ -19,9 +19,7 @@ body {
 }
 
 #userQuery {
-    color: white; /* Sets the text color to white */
-    /* You might also want to set the background color for better visibility */
-    background-color: #333; /* Example: dark background for contrast */
+    color: white; 
 }
 
 

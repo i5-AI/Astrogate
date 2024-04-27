@@ -7,9 +7,9 @@ function App() {
   return (
     <div>
       <div className="container poppins-light">
-        <div className="box chat-history">
+        {/* <div className="box chat-history">
           <ChatHistory />
-        </div>
+        </div> */}
         <div className="box chat-main">
           <Chat />
         </div>
