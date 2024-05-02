@@ -6,7 +6,7 @@ import '../style.css';
 function App() {
   return (
     <div>
-      <div className="container poppins-light">
+      <div className="container poppins-light" style={{ overflow: 'hidden' }}>
         {/* <div className="box chat-history">
           <ChatHistory />
         </div> */}

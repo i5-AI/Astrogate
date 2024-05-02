@@ -1,24 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+
 html, body {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+  /* height: 100%; */
+  /* width: 100%; */
+  /* display: flex; */
+  /* flex-direction: column; */
   justify-content: center;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .title {
   color: #3B3B3B;
   font-size: 25px;
   margin-left: 12%;
-  margin-top: 8%;
+  margin-top: 8%; 
   min-width: 250px;
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
 }
-
 .chat-title {
   font-size: 30px;
   font-family: 'Poppins', sans-serif;
@@ -75,6 +75,9 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; 
 }
 
 .messages {
@@ -189,7 +192,7 @@ input[type="text"]:focus {
   align-items: stretch;
   justify-content: center;
   width: 100%;
-  height: 90vh;
+  /* height: 90vh; */
 }
 
 .box {
@@ -214,7 +217,7 @@ input[type="text"]:focus {
 
 .chat-main {
   width: 70%;
-  margin-right: 2%;
+  /* margin-right: 2%; */
   padding-right: 100px;
   padding-left: 100px;
 }
@@ -261,3 +264,101 @@ input[type="text"]:focus {
   40% { transform: scale(1.0); }
 }
 
+
+@media (max-width: 768px) {
+
+  html, body {
+    overflow-y: hidden;
+    /* max-height: 350px; */
+  }
+
+  .container {
+    margin-top: 15px;
+  }
+  
+  .title {
+    font-size: 18px;
+    margin-left: 5%;
+    margin-top: 8%; 
+  }
+
+  .chat-title {
+    font-size: 24px; 
+  }
+
+  .user-message {
+    width: auto;
+  }
+
+  .chat-bubble {
+    font-size: 16px; 
+  }
+
+  input {
+    font-size: 15px;
+  }
+
+  .chats-container {
+    padding-bottom: 10px;
+  }
+
+  .message-bar {
+    height: 40px;
+  }
+
+  .messages {
+    padding-bottom: 0px;
+  }
+
+  .ai-message,
+  .user-message {
+    max-width: 80%;
+  }
+
+  .arrow-and-circle {
+    margin-bottom: 130px;
+  }
+
+  .chat-history {
+    padding-right: 10px;
+  }
+
+  .chat-main {
+    padding-right: 50px;
+    padding-left: 50px;
+  }
+
+  .footer {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  
+  .bar {
+    width: 80%; 
+    height: 75px;
+  }
+
+  .user-chats {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto; 
+    width: 100%; 
+    margin-bottom: 100px; 
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    text-align: left; 
+  }
+
+  #app {
+    overflow: hidden !important;
+}
+
+.footer-div {
+  display: none; 
+}
+
+}
+
+#app {
+  overflow: hidden !important;
+}
