@@ -1,6 +1,6 @@
 ## Astrogate 
 ### i5 Space Chatbot 
-C/Pung 10 Mar 2024
+C/Pung 30 June 2024
 
 ### Overview 
 Project Goal: Turn the information on the [air force handbook](https://static.e-publishing.af.mil/production/1/af_a1/publication/afh1/afh1.pdf) and [publication page](https://www.e-publishing.af.mil/Product-Index/#/?view=cat&catID=1) into a chatbot.
