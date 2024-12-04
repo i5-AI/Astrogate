@@ -73,12 +73,12 @@ def find_closest_matches(embedding):
     }
 
     collections = [
-        "FTM_2022_Final",
-        "dafi36_2903",
-        "dafpam34_1203",
-        "dafh33_337",
-        "DAFI_36_2903_AFROTCSup",
-        "_i5SOP",
+        "FTM_2022_Final_reformatted",
+        "dafi36_2903_embeddings_reformatted",
+        "DAFI_36_2903_AFROTCSup_reformatted",
+        "_i5SOP_reformatted",
+        "dafh33_337_reformatted",
+        "dafpam34_1203_reformatted",
     ]
 
     all_results = []
@@ -87,8 +87,7 @@ def find_closest_matches(embedding):
         payload = {
             "collectionName": collection,
             "filter": "",
-            "limit": 10,
-            "outputFields": ["id", "text"],
+            "outputFields": ["id", "text", "distance"],  # Include distance field
             "vector": embedding,
         }
 
@@ -105,13 +104,23 @@ def find_closest_matches(embedding):
                 f"Failed to find closest matches in {collection}: {response.status_code} {response.text}"
             )
 
-    # Check the structure of the results and handle accordingly
-    if all_results and "distance" not in all_results[0]:
-        logging.error(f"Unexpected result structure: {all_results[0]}")
-        raise KeyError("'distance' key not found in results")
+    # Log invalid results
+    invalid_results = [r for r in all_results if r.get("distance") is None]
+    if invalid_results:
+        logging.warning(f"Found results with missing or None distance: {invalid_results}")
 
-    # Sort all results by their distance and take the top 10 (smaller distance is better)
-    all_results = sorted(all_results, key=lambda x: x["distance"])[:10]
+    # Sort all results by their distance and filter out invalid results
+    all_results = sorted(
+        [r for r in all_results if r.get("distance") is not None],
+        key=lambda x: x["distance"]
+    )[:10]
+
+    # Print Primary Key and Distance
+    print("Primary Key and Distance for Each Chunk:")
+    for result in all_results:
+        primary_key = result.get("id", "Unknown")
+        distance = result.get("distance", "Unknown")
+        print(f"Primary Key: {primary_key}, Distance: {distance}")
 
     chat_gpt_text = extract_text({"data": all_results})
     return chat_gpt_text
@@ -160,6 +169,7 @@ def ask_gpt(question, document_text):
 
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:
+        print("responses: ", response.json())
         return response.json()["choices"][0]["message"]["content"]
     else:
         error_message = f"Failed to ask GPT: {response.status_code} {response.text}"
