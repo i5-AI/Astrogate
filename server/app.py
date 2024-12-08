@@ -75,10 +75,10 @@ def find_closest_matches(embedding):
     collections = [
         "FTM_2022_Final_reformatted",
         "dafi36_2903_embeddings_reformatted",
+        "dafpam34_1203_reformatted",
+        "dafh33_337_reformatted",
         "DAFI_36_2903_AFROTCSup_reformatted",
         "_i5SOP_reformatted",
-        "dafh33_337_reformatted",
-        "dafpam34_1203_reformatted",
     ]
 
     all_results = []
@@ -96,6 +96,7 @@ def find_closest_matches(embedding):
         )
 
         if response.status_code == 200:
+            print('response', response.json())
             data_list = response.json()["data"]
             logging.debug(f"Data list from collection {collection}: {data_list}")
             all_results.extend(data_list)
@@ -104,23 +105,35 @@ def find_closest_matches(embedding):
                 f"Failed to find closest matches in {collection}: {response.status_code} {response.text}"
             )
 
-    # Log invalid results
-    invalid_results = [r for r in all_results if r.get("distance") is None]
-    if invalid_results:
-        logging.warning(f"Found results with missing or None distance: {invalid_results}")
+    # Check the structure of the results and handle accordingly
+    if all_results and "distance" not in all_results[0]:
+        logging.error(f"Unexpected result structure: {all_results[0]}")
+        raise KeyError("'distance's key not found in results")
+
+    #print("\n\n\nBUMBLEBEE\n\n", all_results, "\n\n\n") 
+
+    print("\n\n\n\nPrimary Key and Distance for Each Chunk:")
+    for result in all_results:
+        print(result, "BUMBLEBEE\n\n")
+        
+        #primary_key = result.get("id", "Unknown")
+        #distance = result.get("distance", "Unknown")
+        #print(f"Primarsy Key: {primary_key}, Distance: {distance}")
+
+    print("\n\n\n\n")
 
     # Sort all results by their distance and filter out invalid results
-    all_results = sorted(
-        [r for r in all_results if r.get("distance") is not None],
-        key=lambda x: x["distance"]
-    )[:10]
+    all_results = sorted(all_results, key=lambda x: x["distance"])[:10]
+
+    print("\n\n", all_results, "\n\n")
 
     # Print Primary Key and Distance
-    print("Primary Key and Distance for Each Chunk:")
+    print("\nPrimary Key and Distance for Each Chunk:")
     for result in all_results:
+        print("\n")
         primary_key = result.get("id", "Unknown")
         distance = result.get("distance", "Unknown")
-        print(f"Primary Key: {primary_key}, Distance: {distance}")
+        print(f"Primarsy Key: {primary_key}, Distance: {distance}")
 
     chat_gpt_text = extract_text({"data": all_results})
     return chat_gpt_text
