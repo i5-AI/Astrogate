@@ -1,125 +1,220 @@
-import '../../style.css';
-import './arrow.css';
-import { Component, createRef } from 'preact';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import './Chat.css';
 
-export default class Chat extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      userInput: '',
-      messages: [{
-        text: "Hello, I’m Astrogate. A chatbot designed for Air Force and Space Force cadets on queries regarding the Tongue and Quill, Dress and Ceremonies, marching, and more. My information comes directly from Air Force documents, and I will provide sources for my responses. Please, ask me a question!",
-        sender: 'ai',
-        globalDocumentText: '' // temporary storage for the document text
-      }],
-      isThinking: false
+const Chat = () => {
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    // Check if backend is ready
+    checkBackendStatus();
+  }, []);
+
+  const checkBackendStatus = async () => {
+    try {
+      setIsChecking(true);
+      
+      // Check backend status
+      const statusResponse = await axios.get('http://localhost:8000/status');
+      
+      if (statusResponse.data.initialized) {
+        setIsReady(true);
+        setMessages([{
+          id: 1,
+          text: "Hello! I'm Astrogate, your Air Force and Space Force document assistant. I can help you find information from official military documents. What would you like to know?",
+          sender: 'assistant',
+          timestamp: new Date()
+        }]);
+      } else {
+        // Backend is running but not initialized yet, wait and retry
+        setTimeout(checkBackendStatus, 2000);
+      }
+    } catch (err) {
+      console.error('Backend status check error:', err);
+      // Backend not running, wait and retry
+      setTimeout(checkBackendStatus, 2000);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return;
+
+    const userMessage = {
+      id: Date.now(),
+      text: inputMessage,
+      sender: 'user',
+      timestamp: new Date()
     };
-    this.userInputRef = createRef();
-  }
 
-  handleSubmit = () => {
-    const userInputTrimmed = this.userInputRef.current.value.trim();
-    console.log("User input: ", userInputTrimmed);
-    if (userInputTrimmed) {
-      this.setState(prevState => ({
-        messages: [...prevState.messages, { text: userInputTrimmed, sender: 'user' }],
-        userInput: ''
-      }), () => {
-        this.userInputRef.current.value = '';
-        this.submitQuery(userInputTrimmed);
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:8000/chat', {
+        message: inputMessage
       });
-    } else {
-      console.log('No query to send.');
+
+      const assistantMessage = {
+        id: Date.now() + 1,
+        text: response.data.response,
+        sender: 'assistant',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: 'Sorry, I encountered an error. Please try again.',
+        sender: 'assistant',
+        timestamp: new Date(),
+        isError: true
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  submitQuery = (userQuery) => {
-    console.log("Sending query to server...");
-    this.setState({ isThinking: true });
-    axios.post('http://localhost:8000/create-embedding', { // Ensure the correct URL and port
-      query: userQuery
-    })
-    .then(response => {
-      const answer = response.data.answer;
-      this.setState(prevState => ({
-        messages: [...prevState.messages, { text: answer, sender: 'ai' }],
-        isThinking: false
-      }));
-    })
-    .catch(error => {
-      this.setState({ isThinking: false });
-      console.error("Error:", error);
-    });
-  };
-
-  handleInputChange = (e) => {
-    if (e.key === 'Enter') {
-      this.handleSubmit();
-    } else {
-      this.setState({ userInput: e.target.value });
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
 
-  scrollToBottom = () => {
-    const chatContainer = document.querySelector('.user-chats');
-    const thinkingDots = document.querySelector('.thinking-dots');
-    // @ts-ignore
-    const thinkingDotsHeight = thinkingDots ? thinkingDots.offsetHeight : 0;
-    chatContainer.scrollTop = chatContainer.scrollHeight + thinkingDotsHeight;
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.messages.length < this.state.messages.length || this.state.isThinking) {
-      this.scrollToBottom();
-    }
-  }
-
-  render() {
+  if (isChecking) {
     return (
-      <div className="chat">
-        <div className="chat-title">
-          <p>Astrogate</p>
+      <div className="chat-container">
+        <div className="chat-header">
+          <h1>Astrogate</h1>
+          <p>Air Force & Space Force Document Assistant</p>
         </div>
-        <div className="chats-container">
-          <div className="astrogate-chats"></div>
-          <div className="user-chats">
-            {this.state.messages.map((message, index) => (
-              <div key={index} className={`chat-bubble ${message.sender === 'ai' ? 'ai-message' : 'user-message'}`}>
-                {message.text}
-              </div>
-            ))}
-            {this.state.isThinking && <div className="thinking-dots">
+        
+        <div className="initialization-error">
+          <h3>Starting Up...</h3>
+          <p>Loading documents and initializing assistant...</p>
+          <div className="loading-indicator">
+            <div className="typing-dots">
               <div className="dot"></div>
               <div className="dot"></div>
               <div className="dot"></div>
-            </div>}
-          </div>
-        </div>
-        <div className="messages">
-          <div className="bar">
-            <div className="message-bar">
-              <input
-                ref={this.userInputRef}
-                className="input-text"
-                type="text"
-                placeholder="Type a message..."
-                value={this.state.userInput}
-                onChange={this.handleInputChange}
-                onKeyPress={this.handleInputChange}
-              />
             </div>
-            <button className="submit-message" onClick={this.handleSubmit}>
-              <div className="container2">
-                <div id="submit" className="arrow-and-circle">
-                  <div className="icono-arrow1-up arrow"></div>
-                  <div className="circle"></div>
-                </div>
-              </div>
-            </button>
           </div>
         </div>
       </div>
     );
   }
-}
+
+  if (!isReady) {
+    return (
+      <div className="chat-container">
+        <div className="chat-header">
+          <h1>Astrogate</h1>
+          <p>Air Force & Space Force Document Assistant</p>
+        </div>
+        
+        <div className="initialization-error">
+          <h3>Connecting...</h3>
+          <p>Waiting for backend to initialize. This may take a moment...</p>
+          <div className="loading-indicator">
+            <div className="typing-dots">
+              <div className="dot"></div>
+              <div className="dot"></div>
+              <div className="dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="chat-container">
+      <div className="chat-header">
+        <h1>Astrogate</h1>
+        <p>Air Force & Space Force Document Assistant</p>
+        <div className="status-indicator">
+          <span className="status-dot online"></span>
+          Ready
+        </div>
+      </div>
+
+      <div className="messages-container">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`message ${message.sender} ${message.isError ? 'error' : ''}`}
+          >
+            <div className="message-content">
+              <div className="message-text">{message.text}</div>
+              <div className="message-timestamp">
+                {message.timestamp.toLocaleTimeString()}
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="message assistant">
+            <div className="message-content">
+              <div className="loading-indicator">
+                <div className="typing-dots">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="input-container">
+        <div className="input-wrapper">
+          <textarea
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me about Air Force documents, uniforms, procedures..."
+            disabled={isLoading}
+            rows={1}
+            className="message-input"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!inputMessage.trim() || isLoading}
+            className="send-button"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Chat; 
